@@ -25,6 +25,13 @@
   <%= @task.priority %>
 </p>
 
+<p class = "task_show">
+  <strong><%= ('ラベル') %></strong>
+  <% @task.labels.each do |label| %>
+    <%= label.label %>
+  <% end %>
+</p>
+
 <%= link_to(t('activerecord.blog.edit') , edit_task_path(@task)) %> |
 <%= link_to(t('activerecord.blog.back'), tasks_path) %>
 

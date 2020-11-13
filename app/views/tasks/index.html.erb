@@ -5,13 +5,15 @@
     <div>
       <%= f.label(t('activerecord.blog.title')) %>
       <%= f.text_field :sarch_title %>
-    </div>
-      
-    <div>
+    
       <%= f.label(t('activerecord.blog.status')) %>
       <%= f.select :sarch_status, ['未着手','着手中','完了'], include_blank: true, selected: "" %>
-      <%= f.submit'検索' %>
+
+      <%= f.label('ラベル') %>
+      <%= f.select(:label_id, Label.pluck(:label, :id), { include_blank: true }) %>
     </div>
+
+    <div><%= f.submit'検索' %></div>
   <% end %>
 </div>
 
@@ -24,6 +26,7 @@
         <th class="hidden-xs hidden-sm col-md-1"><%= link_to(t('activerecord.blog.limit_sort'), tasks_path(sort_expired: "true")) %></th>
         <th class="hidden-xs col-sm-2 col-md-1"><%= t 'activerecord.blog.status' %></th>
         <th class="col-xs-1 col-sm-2 col-md-1"><%= link_to(t('activerecord.blog.priority_sort'), tasks_path(sort_priority: "true")) %></th>
+        <th class="col-xs-2 col-sm-2 col-md-1"><%= t('ラベル') %></th>
         <th coldiv="3"></th>
       </tr>
     </thead>
@@ -36,6 +39,11 @@
           <td class="hidden-xs hidden-sm col-md-2"><%= task.limit.strftime("%Y-%m-%d %H:%M") %></td>
           <td class="hidden-xs col-sm-1 col-md-1"><%= task.status %></td>
           <td class="col-xs-1 col-sm-1 col-md-1"><%= task.priority %></td>
+          <td class="col-xs-2 col-sm-2 col-md-1">
+            <% task.labels.each do |label| %>
+              <%= label.label %>
+            <% end %>
+          </td>
           <td class="col-xs-1 col-sm-1 col-md-1"><%= link_to(t('activerecord.blog.show'), task_path(id:task.id)) %></td>
           <td class="col-xs-1 col-sm-1 col-md-1"><%= link_to(t('activerecord.blog.edit'), edit_task_path(id:task.id)) %></td>
           <td class="col-xs-1 col-sm-1 col-md-1"><%= link_to(t('activerecord.blog.delete'), task_path(id:task.id), method: :delete, data: { confirm: t('activerecord.blog.are_you_sure_to_delete') }) %></td>

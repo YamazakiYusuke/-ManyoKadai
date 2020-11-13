@@ -27,13 +27,27 @@
 
   <div class="field task_show">
     <%= form.label(t('activerecord.blog.status')) %>
-    <%= form.select :status, ['未着手','着手中','完了'], include_blank: true, selected: "" %>
+    <%= form.select :status, ['未着手','着手中','完了'], include_blank: true %>
   </div>
 
   <div class="field task_show">
     <%= form.label(t('activerecord.blog.priority')) %>
-    <%= form.select :priority, ['低','中','高'], include_blank: true, selected: "" %>
+    <%= form.select :priority, ['低','中','高'], include_blank: true %>
   </div>
+
+  <div class="field task_show">
+    <%= form.label('ラベル') %>
+    <table id="label_table">
+      <tr>
+      <%= form.collection_check_boxes(:label_ids, Label.all, :id, :label) do |b| %>
+        <td>
+          <%= b.label { b.check_box + b.label } %> 
+        </td>
+      <% end %>
+      </tr>
+    </table>
+  </div>
+
 
   <div class="actions">
     <%= form.submit %>

@@ -1,6 +1,6 @@
 class Admin::UsersController < ApplicationController
   before_action :set_user, only: [:edit, :update, :destroy]
-  before_action :are_you_owner?, only: [:index, :new, :edit]
+  before_action :are_you_manager?, only: [:index, :new, :edit]
 
   def index
     @users = User.all.includes(:tasks).page(params[:page]).per(20).order(admin: :desc)
@@ -44,8 +44,7 @@ class Admin::UsersController < ApplicationController
     params.require(:user).permit(:name, :email, :password, :password_confirmation,:admin )
   end
 
-  def are_you_owner?
-
+  def are_you_manager?
     if current_user == nil || current_user.admin == false
       redirect_to tasks_path, notice: "管理権限がありません"
     end

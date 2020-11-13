@@ -6,14 +6,29 @@ class TasksController < ApplicationController
     tasks = current_user.tasks
     if params[:task]
       params_sarch_title = params[:task][:sarch_title]
-      params_sarch_status = params[:task][:sarch_status]
-
-      if params_sarch_title != "" && params_sarch_status != ""
+      params_sarch_status = params[:task][:sarch_status] 
+      if params[:task][:label_id] != ""
+        set_label = Label.find(params[:task][:label_id]) 
+        set_label = set_label.tasks
+      end
+      # タイトル&ステータス&ラベル検索
+      if params_sarch_title != "" && params_sarch_status != "" && params[:task][:label_id] != ""
+        @tasks = set_label.title_scope(params_sarch_title).status_scope(params_sarch_status) 
+      # タイトル＆ステータス / タイトル＆ラベル / ステータス&ラベル 検索
+      elsif params_sarch_title != "" && params_sarch_status != ""
         @tasks = tasks.title_scope(params_sarch_title).status_scope(params_sarch_status)
+      elsif params_sarch_title != "" && params[:task][:label_id] != ""
+        @tasks = set_label.title_scope(params_sarch_title)
+      elsif params_sarch_status != "" && params[:task][:label_id] != ""
+        @tasks = set_label.status_scope(params_sarch_status)
+      # タイトル / ステータス / ラベル 検索
       elsif params_sarch_title != ""
         @tasks = tasks.title_scope(params_sarch_title)
       elsif params_sarch_status != ""
         @tasks = tasks.status_scope(params_sarch_status)
+      elsif params[:task][:label_id] != ""
+        @tasks = set_label
+      # その他 何も入力しないで検索を押したとき
       else
         @tasks = tasks.order(limit: :desc)
       end
@@ -31,7 +46,7 @@ class TasksController < ApplicationController
   end
 
   def show
-    redirect_to tasks_path, notice: '指定のページは表示できません' if current_user.id != @task.id
+    redirect_to tasks_path, notice: '指定のページは表示できません' if current_user.id != @task.user.id
   end
 
   def new
@@ -43,7 +58,7 @@ class TasksController < ApplicationController
 
   def create
     @task = Task.new(task_params)
-    @task.user_id = current_user.id    
+    @task.user_id = current_user.id
     respond_to do |format|
       if @task.save
         format.html { redirect_to tasks_path, notice: '新しいタスクを登録しました' }
@@ -77,17 +92,17 @@ class TasksController < ApplicationController
   end
 
   private
-    def set_task
-      @task = Task.find(params[:id])
-    end
+  def set_task
+    @task = Task.find(params[:id])
+  end
 
-    def task_params
-      params.require(:task).permit(:title, :content, :limit, :status, :priority)
-    end
+  def task_params
+    params.require(:task).permit(:title, :content, :limit, :status, :priority, label_ids: [] )
+  end
 
-    def unless_logged_in?
-      unless logged_in?
-        redirect_to new_session_path, notice: "ログインしてください" 
-      end
+  def unless_logged_in?
+    unless logged_in?
+      redirect_to new_session_path, notice: "ログインしてください" 
     end
+  end
 end

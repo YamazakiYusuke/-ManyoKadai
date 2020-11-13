@@ -10,10 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_10_073915) do
+ActiveRecord::Schema.define(version: 2020_11_12_015107) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "join_task_labels", force: :cascade do |t|
+    t.bigint "task_id"
+    t.bigint "label_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["label_id"], name: "index_join_task_labels_on_label_id"
+    t.index ["task_id"], name: "index_join_task_labels_on_task_id"
+  end
+
+  create_table "labels", force: :cascade do |t|
+    t.string "label"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "tasks", force: :cascade do |t|
     t.string "title", null: false
@@ -36,5 +51,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_073915) do
     t.boolean "admin", default: false, null: false
   end
 
+  add_foreign_key "join_task_labels", "labels"
+  add_foreign_key "join_task_labels", "tasks"
   add_foreign_key "tasks", "users"
 end
